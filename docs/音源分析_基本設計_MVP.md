@@ -52,6 +52,7 @@
 - 停止: `make auto-stop`（内部的に `.cache/auto_runner.stop` で停止を指示）
 - 状態: `make auto-status`
 - ログ: `logs/auto_runner.log`（起動/停止/実行/エラー）
+ - メトリクス: `logs/metrics.ndjson` に各音源ごとの所要時間（transcribe/analyze/sheets）と試行回数を1行JSONで追記
 
 ## 文字起こし（Gemini スケルトン）
 - 設定: `config/settings.json` の `gemini` セクション（`api_key_env`, `model_transcribe`）
@@ -68,3 +69,4 @@
 - 2025-08-18: watcher にリトライ/ログ/退避メモを追加、transcriber を Gemini 対応スケルトン化、Makefile に `watch` を追加。
 - 2025-08-19: transcriber を Gemini 本接続。`google-generativeai` 経由でAPI呼出し、`response_mime_type=application/json` を指定。429/5xxは指数バックオフ（1/2/4/… 最大5回）で再試行し、最終失敗時はダミーにフォールバック。出力スキーマ（transcript_text/segments/meta）は維持。
 - 2025-08-19: `config/script_master.json` の dictionaries を増補（positive/negative/date_terms/schedule_words）。analyzer の辞書連動は既存仕様のまま（DATE_TERMS結合→日程ヒント、negative→未検討/不要の判定補強）。
+ - 2025-08-19: watcher に観測メトリクスを追加（所要時間/試行回数）。`logs/metrics.ndjson` にNDJSON形式で出力。

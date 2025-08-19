@@ -6,7 +6,7 @@
 - 監視: リトライ（1/2/4s）、ログ出力、失敗時退避メモ、Make `watch`
 
 ## Next
-- 可観測性: 失敗統計/実行時間を `logs/` にメトリクス出力
+- 可観測性: 集計スクリプトで日次要約を出力（未着手）
 
 ## Doing
 - なし（随時更新）
@@ -15,6 +15,7 @@
 - Sheets安定化、マスタ連動、監視リトライ/ログ、NDJSON再送、設計ドキュ差分追記
 - 文字起こし: Gemini 本接続（API呼出し・指数バックオフ・JSON整形/フォールバック）
 - 辞書拡充: `script_master.json` dictionaries（negative/positive/date_terms/schedule_words）を増補
+- 可観測性: `scripts/watcher.py` に所要時間/試行回数を `logs/metrics.ndjson`へ記録
 
 ## Decisions
 - 正準設定: `settings.sheets.*`（`settings.google.*` はフォールバック）
