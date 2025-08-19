@@ -1,0 +1,12 @@
+You are generating `scripts/transcriber.py` for a Python 3.10+ project.
+Constraints:
+- Use google.generativeai (Gemini 2.5 Pro) for transcription + diarization.
+- Input: audio file path (mp3, <= 60min).
+- Output: JSON to STDOUT with keys: transcript_text, segments[{t,speaker,text}], meta{language}, file_meta{date,phone,filename,processed_at}.
+- Speaker tags: "OP" for operator, "CUS" for customer (heuristic OK).
+- Filename meta parse: date(YYYY-MM-DD), phone(2番目トークンの数字を正規化) from "YYYY-MM-DD_PHONE_...".
+- No Drive I/O here. No Sheets here.
+- Read settings from config/settings.json (gemini.api_key_env).
+- Fail gracefully with exit code!=0 and message to STDERR.
+
+Consult context files for domain rules (codex/context/*).

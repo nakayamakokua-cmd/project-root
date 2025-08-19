@@ -1,0 +1,22 @@
+# CodexCLI（2025年以降）を想定した汎用コンフィグ
+# - 実際のCLIに合わせて "runner" や "flags" は後で上書き可
+runner:
+  cmd: "codex"         # ここが実行コマンド（無ければ bin/codex-local.sh を使う）
+  subcommands:
+    chat: "chat"
+    gen: "generate"
+model:
+  name: "gpt-5-thinking"    # 任意表記。実コマンド側で無視されてもOK
+paths:
+  system: "codex/prompts/system_prompt.md"
+  kickoff: "codex/prompts/session_kickoff.md"
+  context:
+    - "codex/context/product_context.md"
+    - "Profiles/talk_script_v1.md"
+    - "config/ng_master.json"
+    - "config/script_master.json"
+    - "config/settings.json"
+    - "codex/context/_recent_changes.md"
+    - "codex/context/_analysis_mvp_design.md"
+  templates_dir: "codex/templates"
+  snapshots_dir: "codex/snapshots"

@@ -1,0 +1,21 @@
+{
+  "google": {
+    "drive_folder_id": "1kaTaJqjVuwnbidwtH3NtSz40xFnXhQrn",
+    "spreadsheet_id": "1AkkDITbtPXPmE9cvHJ5NxOLlMfKwrZamptfC_Wmii0I",
+    "sheet_name": "NG分析",
+    "oauth": "browser"
+  },
+  "gemini": {
+    "model_transcribe": "gemini-2.5-pro",
+    "model_analyze": "gemini-2.5-pro",
+    "api_key_env": "GEMINI_API_KEY"
+  },
+  "masters": {
+    "ng_master_path": "config/ng_master.json",
+    "script_master_path": "config/script_master.json"
+  },
+  "io": {
+    "temp_dir": ".cache",
+    "log_dir": "logs"
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2025-08-18",
+  "priority_order": ["3","5","4","1","2","6"],
+  "competitors": ["Inbox","BtoBプラットフォーム","TOKIUM","バクラク"],
+  "categories": [
+    {
+      "id": "1",
+      "name": "システム・ツール状況",
+      "minors": [
+        {
+          "code": "1a",
+          "name": "既存システム導入済み",
+          "keywords_any": ["導入している","使っている","既にある","利用中","追加は不要"],
+          "route_hint": "#3-2",
+          "examples": ["すでに電子請求書システムを導入済みです","◯◯を使っているので結構です"]
+        },
+        {
+          "code": "1b",
+          "name": "競合サービス利用中",
+          "keywords_any": ["Inbox","BtoBプラットフォーム","TOKIUM","バクラク"],
+          "route_hint": "#3-2",
+          "examples": ["BtoBプラットフォーム使ってます","バクラク契約中です"]
+        },
+        {
+          "code": "1c",
+          "name": "システム入れ替え予定なし",
+          "keywords_any": ["今ので十分","入れ替え予定ない","切替予定ない","現状維持"],
+          "route_hint": "#3-3",
+          "examples": ["今のシステムで十分です","入れ替えはしばらく予定ありません"]
+        },
+        {
+          "code": "1d",
+          "name": "会計システム非対応",
+          "keywords_any": ["連携できない","対応していない","全部変更しないと無理"],
+          "route_hint": null,
+          "examples": ["会計ソフトに連携できないので無理です"]
+        },
+        {
+          "code": "1e",
+          "name": "顧客業務の特殊形態",
+          "keywords_any": ["顧客別","原本保管","相殺計算","統一運用できない","特殊"],
+          "route_hint": "#3-1-2",
+          "examples": ["顧客別カスタムなので統一できません","紙の原本を残す必要があります"]
+        },
+        {
+          "code": "1f",
+          "name": "最近同内容の商談実施済み",
+          "keywords_any": ["先日説明を受けた","この前話した","既にミーティングした","別営業から同じ話"],
+          "route_hint": null,
+          "examples": ["別のところから同じ説明を受けました"]
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "業務ニーズ無し",
+      "minors": [
+        {
+          "code": "2a",
+          "name": "業務量が少ない",
+          "keywords_any": ["数枚しか来ない","件数が少ない","規模的に不要"],
+          "route_hint": "#3-1-1",
+          "examples": ["請求書は月に数枚なので不要です"]
+        },
+        {
+          "code": "2b",
+          "name": "現行運用で十分",
+          "keywords_any": ["紙とExcelで間に合ってる","困っていない","現状で十分"],
+          "route_hint": "#3-3",
+          "examples": ["今のやり方で特に困っていません"]
+        },
+        {
+          "code": "2c",
+          "name": "受領業務が存在しない",
+          "keywords_any": ["受け取りしていない","発行のみ","出してない"],
+          "route_hint": null,
+          "examples": ["請求書の受け取り自体をしていません"]
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "即NG",
+      "minors": [
+        { "code": "3a", "name": "不要・間に合っている明言", "keywords_any": ["いりません","必要ない","間に合っている","全く必要ありません"], "examples": [] },
+        { "code": "3b", "name": "過去検討済みで不要結論", "keywords_any": ["以前提案を受けた","見送った","不要と結論"], "examples": [] },
+        { "code": "3c", "name": "営業一律お断り", "keywords_any": ["営業電話はお断り","外部からの提案は受けない"], "examples": [] },
+        { "code": "3d", "name": "業務喪失懸念", "keywords_any": ["仕事がなくなる","部署が不要になる"], "examples": [] },
+        { "code": "3e", "name": "途中打ち切り", "keywords_any": ["結構です","忙しいので失礼します"], "examples": [] },
+        { "code": "3f", "name": "情報開示拒否", "keywords_any": ["会社名は言えない","情報は出せない"], "examples": [] },
+        { "code": "3g", "name": "即時拒否・低関心", "keywords_any": ["興味ない","必要ありません"], "examples": [] }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "タイミング・時期要因",
+      "minors": [
+        { "code": "4a", "name": "繁忙期で対応不可", "keywords_any": ["月末月初は忙しい","今期バタバタ"], "route_hint": "#3-4", "examples": [] },
+        { "code": "4b", "name": "先の予定不透明", "keywords_any": ["いつ空くかわからない","落ち着く時期が未定"], "route_hint": "#3-4", "examples": [] },
+        { "code": "4c", "name": "長期的に調整不可", "keywords_any": ["数か月先まで難しい","お盆で無理"], "route_hint": "#3-4", "examples": [] }
+      ]
+    },
+    {
+      "id": "5",
+      "name": "権限・担当範囲",
+      "minors": [
+        { "code": "5a", "name": "判断権限なし", "keywords_any": ["決定権は部長","私は判断できない"], "examples": [] },
+        { "code": "5b", "name": "担当部署外", "keywords_any": ["経理じゃない","関係ない部署"], "examples": [] },
+        { "code": "5c", "name": "担当者不明/履歴不明", "keywords_any": ["誰かわからない","担当が変わった"], "route_hint": "#2-1", "examples": [] },
+        { "code": "5d", "name": "海外本社・外資指示", "keywords_any": ["海外システム","外資の指示"], "examples": [] },
+        { "code": "5e", "name": "外部委託先一括管理", "keywords_any": ["全部委託先を通す","勝手に設定できない"], "examples": [] },
+        { "code": "5f", "name": "親会社・系列の統一運用", "keywords_any": ["本社が決める","親会社方針で統一"], "examples": [] },
+        { "code": "5g", "name": "業務委託・外部専門家依存", "keywords_any": ["税理士に任せている","外部に回している"], "examples": [] }
+      ]
+    },
+    {
+      "id": "6",
+      "name": "認識・情報不足",
+      "minors": [
+        { "code": "6a", "name": "話の経緯・内容が不明", "keywords_any": ["なんの話","覚えていない"], "route_hint": "#3-1", "examples": [] },
+        { "code": "6b", "name": "発行/受取の誤認", "keywords_any": ["発行の話","発行側なので関係ない"], "route_hint": "#3-2", "examples": [] },
+        { "code": "6c", "name": "機能の誤認・限定理解", "keywords_any": ["請求書だけなら不要","保存できないなら不要"], "examples": [] },
+        { "code": "6d", "name": "部分利用経験による不要判断", "keywords_any": ["一部で使っているので十分"], "route_hint": "#2-3", "examples": [] }
+      ]
+    }
+  ]
+}

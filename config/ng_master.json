@@ -1,0 +1,74 @@
+{
+  "version": "v1",
+  "updated_at": "2025-08-18",
+  "priority_order": ["3","5","4","1","2","6"],
+  "competitors": ["Inbox","BtoBプラットフォーム","TOKIUM","バクラク"],
+  "categories": [
+    {
+      "key": "1",
+      "name_jp": "システム・ツール状況",
+      "minors": [
+        { "key": "a", "name_jp": "既存システム導入済み" },
+        { "key": "b", "name_jp": "競合サービス利用中" },
+        { "key": "c", "name_jp": "システム入れ替え予定なし" },
+        { "key": "d", "name_jp": "会計システム非対応" },
+        { "key": "e", "name_jp": "顧客業務の特殊形態" },
+        { "key": "f", "name_jp": "最近同内容の商談実施済み" }
+      ]
+    },
+    {
+      "key": "2",
+      "name_jp": "業務ニーズ無し",
+      "minors": [
+        { "key": "a", "name_jp": "業務量が少ない" },
+        { "key": "b", "name_jp": "現行運用で十分" },
+        { "key": "c", "name_jp": "受領業務が存在しない" }
+      ]
+    },
+    {
+      "key": "3",
+      "name_jp": "即NG",
+      "minors": [
+        { "key": "a", "name_jp": "不要・間に合っている強調" },
+        { "key": "b", "name_jp": "過去検討済み・不要結論" },
+        { "key": "c", "name_jp": "営業一律お断り" },
+        { "key": "d", "name_jp": "業務喪失懸念" },
+        { "key": "e", "name_jp": "途中打ち切り" },
+        { "key": "f", "name_jp": "情報開示拒否" },
+        { "key": "g", "name_jp": "即時拒否・低関心" }
+      ]
+    },
+    {
+      "key": "4",
+      "name_jp": "タイミング・時期要因",
+      "minors": [
+        { "key": "a", "name_jp": "繁忙期で不可" },
+        { "key": "b", "name_jp": "先の予定不透明" },
+        { "key": "c", "name_jp": "長期的に調整不可" }
+      ]
+    },
+    {
+      "key": "5",
+      "name_jp": "権限・担当範囲",
+      "minors": [
+        { "key": "a", "name_jp": "判断権限なし" },
+        { "key": "b", "name_jp": "担当部署外" },
+        { "key": "c", "name_jp": "担当者不明／履歴不明" },
+        { "key": "d", "name_jp": "海外本社・外資系指示" },
+        { "key": "e", "name_jp": "外部委託先の一括管理" },
+        { "key": "f", "name_jp": "親会社・系列の統一運用" },
+        { "key": "g", "name_jp": "業務委託・税理士依存" }
+      ]
+    },
+    {
+      "key": "6",
+      "name_jp": "認識・情報不足",
+      "minors": [
+        { "key": "a", "name_jp": "話の経緯/内容が不明" },
+        { "key": "b", "name_jp": "発行/受取の誤認" },
+        { "key": "c", "name_jp": "機能の誤認・限定理解" },
+        { "key": "d", "name_jp": "部分利用経験による不要判断" }
+      ]
+    }
+  ]
+}

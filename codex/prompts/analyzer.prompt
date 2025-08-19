@@ -1,0 +1,39 @@
+You generate `scripts/analyzer.py` (Python 3.10+).
+Use ONLY local logic + the provided masters to compute one row for Google Sheets (existing 15 headers).
+Inputs:
+- argv[1] = path to transcript JSON (from transcriber), contains:
+  transcript_text (str), segments[{t(str "MM:SS" or "HH:MM:SS"), speaker("OP"/"CUS"), text(str)}],
+  file_meta{date?, phone?, filename, processed_at}
+- config/ng_master.json, config/script_master.json, config/settings.json
+
+Tasks:
+1) Derive phone (10/11 digits, "0" start, no hyphen) from file_meta or filename "YYYY-MM-DD_XXXXXXXXXX_...".
+2) Branch detection = first customer reaction -> one of {"#3-1","#3-2","#3-3","#3-4","MEDAPANI"}.
+3) NG classification:
+   - Extract NG candidates across #2/#3 portions via dictionaries and patterns from ng_master.json.
+   - Define end-window: last 60s OR last 20% of call duration (choose max).
+   - If candidates in window: pick the last by time; else pick last-highest certainty.
+   - Certainty = utterance_strength + speaker_weight + explicitness + consistency (see spec_mvp.md).
+   - evidence = [{t,speaker,text} 3 turns: prev, focal, next], and an excerpt <= 200 chars.
+4) Talk-fit score (0..100): E1..E4 + Goal(day/time ask at turn end)=+20. strict=0.7 semantic.
+5) Count rebuttals (see spec). Count schedule asks at end of #2/#3 turns. Compute lead days for each ask.
+6) Phase time seconds for #1,#2,#3-1..#3-4 (sum of occurrences), integer seconds; total_duration from last seg.
+7) Simple sentiment timeline per turn (lexicon-based or heuristic), triggers when polarity changes sharply.
+
+Output (print to STDOUT, JSON object) covering sheet headers:
+- "ファイル名": original filename
+- "NG理由・断り文句": evidence excerpt (<=200 chars)
+- "話者": guessed operator name or "—"
+- "処理日時": file_meta.processed_at
+- "ファイルID": use filename (or Drive ID if present in file_meta)
+- "チェック内容": branch / notes
+- "アポ取得タグ": e.g., "NG回避" or "—"
+- "NG分類": "<major> > <minor>" (or "不明")
+- "電話番号": normalized phone (or "不明")
+- 残りの項目（会社名, 法人番号, HP, 大業種, 中業種, 従業員数）は空文字で出力
+
+Constraints:
+- No network calls. Robust to missing optional fields.
+- Round floats to 2 decimals where needed, but final sheet row uses strings.
+- Exit non-zero with helpful error on malformed inputs.
+

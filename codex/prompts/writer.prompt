@@ -1,0 +1,19 @@
+You generate `scripts/sheets_writer.py` (Python 3.10+).
+Purpose: Append exactly ONE row to an existing Google Sheet with 15 headers.
+Inputs:
+- argv[1] = path to JSON file with keys exactly matching the 15 headers used in the "NG分析" sheet.
+- Optional flag: --dedupe-key FILE_ID
+Reads:
+- config/settings.json: {google: {spreadsheet_id, sheet_name}, ...}
+Auth:
+- OAuth2 via token.json in project root (create if missing is NOT your job).
+Behavior:
+- Build Sheets API client with httplib2.Http(timeout=180).
+- Append row using 'USER_ENTERED'.
+- Print the Sheets API 'updatedRange' on success.
+- If --dedupe-key is set, fetch the "ファイルID" column and if a value equals FILE_ID then:
+  - Print "SKIP: duplicate ファイルID=<...>" and exit 0 without appending.
+Resilience:
+- Use tenacity retry (max 5, exponential backoff starting 2s) around the append call.
+- On HttpError or Timeout, retry; on final failure, exit non-zero with concise message.
+

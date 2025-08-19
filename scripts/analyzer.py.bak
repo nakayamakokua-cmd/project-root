@@ -1,0 +1,201 @@
+# -*- coding: utf-8 -*-
+"""
+analyzer.py
+- 追加: NG理由の日本語ラベル化 + 検出順チェーン出力 (ng_reason_chain)
+- 既存: 最終NG確定ロジック（終話ウィンドウ/確定度）
+"""
+
+import json, sys, re
+from pathlib import Path
+from datetime import datetime
+from collections import defaultdict
+
+from scripts.utils import load_settings, now_str
+
+# ---- (L20 付近) NGマスタ読み込みと日本語辞書 ----
+SETTINGS = load_settings()
+NG_MASTER_PATH = SETTINGS["masters"]["ng_master_path"]
+
+with open(NG_MASTER_PATH, encoding="utf-8") as f:
+    NG_MASTER = json.load(f)
+
+# 英数字キー → 日本語ラベル辞書を構築
+# 期待構造: categories: [{key: "3", name_jp:"即NG", minors:[{key:"c", name_jp:"営業一律お断り"}, ...]}, ...]
+MAJOR_JP = {}   # 例 {"1": "システム・ツール状況", "3": "即NG", ...}
+MINOR_JP = {}   # 例 {"1.a": "既存システム導入済み", "3.c": "営業一律お断り", ...}
+
+for cat in NG_MASTER.get("categories", []):
+    mkey = str(cat.get("key"))             # "1"~"6"
+    mname = cat.get("name_jp", cat.get("name", mkey))
+    MAJOR_JP[mkey] = mname
+    for mi in cat.get("minors", []):
+        skey = f'{mkey}.{mi.get("key")}'   # "3.c" など
+        sname = mi.get("name_jp", mi.get("name", skey))
+        MINOR_JP[skey] = sname
+
+# ---- (L55 付近) NG候補抽出のダミー/正規表現パターン ----
+# 実運用では辞書にあるキーワードやモデル出力に合わせて強化していく
+PATTERNS = [
+    # (正規表現, major_key, minor_key)
+    (r"営業.*お断り|結構です|必要ありません", "3", "c"),   # 即NG: 営業一律お断り
+    (r"請求書.*受け取って(いない|ない)", "2", "c"),        # 業務ニーズ無し: 受領業務が存在しない
+    (r"親会社|系列.*(統一|決まり)", "5", "f"),             # 権限/範囲: 親会社・系列の統一運用
+    (r"BtoBプラットフォーム|TOKIUM|バクラク|Inbox", "1", "b"), # 競合サービス利用中
+    (r"今は検討していない|導入予定はない", "3", "b"),       # 即NG: 過去検討/不要 or 導入未検討系に近い
+    (r"忙しい|予定が見えない", "4", "b"),                    # タイミング
+]
+
+def ts_to_sec(ts_str):
+    # "MM:SS" or "HH:MM:SS" を秒に
+    parts = [int(x) for x in ts_str.split(":")]
+    if len(parts) == 2:
+        m, s = parts
+        return m*60 + s
+    if len(parts) == 3:
+        h, m, s = parts
+        return h*3600 + m*60 + s
+    return 0
+
+def sec_to_ts(sec):
+    h = sec // 3600
+    m = (sec % 3600) // 60
+    s = sec % 60
+    if h:
+        return f"{h:02d}:{m:02d}:{s:02d}"
+    return f"{m:02d}:{s:02d}"
+
+def utterance_strength(text):
+    # 粗い強度判定（-1..+2）
+    if re.search(r"(結構です|お断り|必要ありません|不要です)", text):
+        return 2
+    if re.search(r"(検討しない|予定ない|難しい)", text):
+        return 1
+    if re.search(r"(かも|今は)", text):
+        return 0
+    return -1
+
+def extract_ng_candidates(segments):
+    """
+    segments: [{ "t":"MM:SS", "speaker":"OP|CUS", "text":... }, ...]
+    return: list of candidates [{t_sec, speaker, major_key, minor_key, major_jp, minor_jp, text, conf}]
+    """
+    cands = []
+    for seg in segments:
+        t_sec = ts_to_sec(seg.get("t","00:00"))
+        spk   = seg.get("speaker","")
+        txt   = seg.get("text","")
+        for pat, maj, minr in PATTERNS:
+            if re.search(pat, txt):
+                major_jp = MAJOR_JP.get(maj, maj)
+                minor_jp = MINOR_JP.get(f"{maj}.{minr}", f"{maj}.{minr}")
+                cands.append({
+                    "t_sec": t_sec,
+                    "speaker": spk,
+                    "major_key": maj,
+                    "minor_key": minr,
+                    "major_jp": major_jp,
+                    "minor_jp": minor_jp,
+                    "text": txt,
+                    "conf": 0.7  # 仮
+                })
+                break
+    return cands
+
+def minor_is_explicit(c):  # 明示度
+    # 競合名などで強めに判定
+    return any(k in c["text"] for k in ["BtoBプラットフォーム","TOKIUM","バクラク","Inbox"])
+
+def major_is_explicit(c):
+    return any(k in c["text"] for k in ["忙しい","親会社","受け取っていない"])
+
+def is_within_last_exchange(c, segments):
+    # 直近1往復（OP↔CUS）の範囲に含めるかを簡易化
+    # ここでは最後から2~3発話以内を真とする粗い実装
+    last3 = segments[-3:]
+    return any(ts_to_sec(s["t"]) == c["t_sec"] for s in last3)
+
+def certainty(c):
+    s = 0
+    s += utterance_strength(c["text"])            # -1..+2
+    s += 0.5 if c["speaker"] == "CUS" else 0      # 顧客重み
+    s += 1.0 if minor_is_explicit(c) else (0.5 if major_is_explicit(c) else 0)
+    # 同カテゴリの連続表現は簡易に +0.5（前の1件だけ見る）
+    s += 0.5
+    return s
+
+def pick_final_ng(cands, total_duration):
+    if not cands:
+        return None
+    end_t = cands[-1]["t_sec"] if cands else total_duration
+    window_start = max(0, end_t - max(60, int(total_duration * 0.2)))
+    window = [c for c in cands if c["t_sec"] >= window_start or True and is_within_last_exchange(c, [])==False]  # 最低限
+    if window:
+        return sorted(window, key=lambda c: c["t_sec"])[-1]
+    # fallback: 終盤優先 + 確定度
+    tail = cands[-5:]
+    return sorted(tail, key=lambda c: (c["t_sec"], certainty(c)))[-1] if tail else None
+
+def build_ng_reason_chain(cands):
+    """
+    検出順（時系列）で日本語 minor を重複なく列挙
+    例: ["営業一律お断り","受領業務が存在しない","親会社・系列の統一運用"]
+    """
+    out = []
+    seen = set()
+    for c in sorted(cands, key=lambda x: x["t_sec"]):
+        label = c["minor_jp"] or c["major_jp"]
+        if label not in seen:
+            out.append(label)
+            seen.add(label)
+    return ", ".join(out)
+
+def analyze(transcript):
+    """
+    transcript: {
+      "transcript_text": "...",
+      "segments": [{"t":"00:10","speaker":"OP","text":"..."}, ...],
+      "meta": {...},
+      "file_meta": {...}
+    }
+    """
+    segments = transcript.get("segments", [])
+    # ---- NG候補抽出 & チェーン構築 (L210 付近・新規) ----
+    cands = extract_ng_candidates(segments)
+    ng_reason_chain = build_ng_reason_chain(cands)
+
+    total_duration = ts_to_sec(segments[-1]["t"]) if segments else 0
+    final = pick_final_ng(cands, total_duration)
+
+    if final:
+        ng_major_jp = final["major_jp"]
+        ng_minor_jp = final["minor_jp"]
+    else:
+        ng_major_jp = "不明"
+        ng_minor_jp = "不明"
+
+    # ここでは最小限の出力行（実運用の列はスキーマに合わせて拡張）
+    row = {
+        "audio_id": transcript.get("file_meta",{}).get("filename",""),
+        "date": transcript.get("file_meta",{}).get("date", ""),
+        "operator": transcript.get("meta",{}).get("note",""),
+        "ng_major": ng_major_jp,
+        "ng_minor": ng_minor_jp,
+        "ng_reason_chain": ng_reason_chain,   # ★ 新規列
+        "processed_at": transcript.get("file_meta",{}).get("processed_at", now_str())
+    }
+    return row
+
+def main():
+    in_path = Path(sys.argv[1]) if len(sys.argv) > 1 else None
+    if not in_path or not in_path.exists():
+        print("Usage: python -m scripts.analyzer <transcript_json_path>", file=sys.stderr)
+        sys.exit(1)
+
+    with in_path.open(encoding="utf-8") as f:
+        transcript = json.load(f)
+
+    row = analyze(transcript)
+    print(json.dumps(row, ensure_ascii=False, indent=2))
+
+if __name__ == "__main__":
+    main()

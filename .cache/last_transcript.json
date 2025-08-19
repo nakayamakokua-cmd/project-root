@@ -1,0 +1,25 @@
+{
+  "transcript_text": "…",
+  "segments": [
+    {
+      "t": "00:10",
+      "speaker": "OP",
+      "text": "もしもし。"
+    },
+    {
+      "t": "00:11",
+      "speaker": "CUS",
+      "text": "はい。"
+    }
+  ],
+  "meta": {
+    "language": "ja",
+    "note": "テスト"
+  },
+  "file_meta": {
+    "date": null,
+    "phone": "",
+    "filename": "sample.mp3",
+    "processed_at": "2025-08-18 19:50:10"
+  }
+}

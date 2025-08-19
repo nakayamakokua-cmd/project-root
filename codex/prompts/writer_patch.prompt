@@ -1,0 +1,6 @@
+Revise scripts/sheets_writer.py to:
+- Ensure httplib2.Http(timeout=180) is used by the Sheets service.
+- Wrap the append call with tenacity retry (max=5, wait_exponential min=2, max=12).
+- After success, ALWAYS print 'updatedRange: <A1-notation>'.
+- Add optional flag --tail to print last 5 rows (A:O) for quick debug.
+Do not change input/output schema.

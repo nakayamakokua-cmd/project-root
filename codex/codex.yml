@@ -1,0 +1,23 @@
+project:
+  name: call-analytics-mvp
+  root: ./
+
+context:
+  include:
+    - codex/context/spec_mvp.md
+    - codex/context/ng_master.json
+    - codex/context/script_master.json
+    - codex/context/settings.json
+  reference:
+    - scripts/transcriber.py
+    - scripts/analyzer.py
+    - scripts/sheets_writer.py
+    - scripts/utils.py
+
+outputs:
+  dir: ./
+
+recipes:
+  analyzer:    { prompt: codex/prompts/analyzer.prompt,    out: scripts/analyzer.py }
+  writer:      { prompt: codex/prompts/writer.prompt,      out: scripts/sheets_writer.py }
+  writer-patch:{ prompt: codex/prompts/writer_patch.prompt,out: scripts/sheets_writer.py }

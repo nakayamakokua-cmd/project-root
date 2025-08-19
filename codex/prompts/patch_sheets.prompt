@@ -1,0 +1,6 @@
+You will revise `scripts/sheets_writer.py` to add:
+- httplib2.Http(timeout=180)
+- tenacity retry for append (5 attempts, wait_exponential 2..12s)
+- Always print updatedRange
+- Add helper to fetch last 5 rows for debug (optional flag --tail)
+Do not change I/O schema or headers.

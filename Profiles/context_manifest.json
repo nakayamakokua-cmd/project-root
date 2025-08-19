@@ -1,0 +1,14 @@
+{
+  "profile_version": 1,
+  "dictionary_version": 1,
+  "script_master_version": 1,
+  "ng_master_version": 1,
+  "sources": {
+    "system_prompt": "Profiles/system_prompt_current.md",
+    "analyzer_profile": "Profiles/analyzer_profile.json",
+    "script_master": "config/script_master.json",
+    "ng_master": "config/ng_master.json",
+    "dictionaries": "Profiles/dictionaries_v1.json"
+  },
+  "last_updated": ""
+}

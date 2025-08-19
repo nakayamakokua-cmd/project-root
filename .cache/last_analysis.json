@@ -1,0 +1,15 @@
+{
+  "candidates": [],
+  "final": null,
+  "out_row": {
+    "audio_id": "sample.mp3",
+    "date": null,
+    "operator": "テスト",
+    "ng_major": "不明",
+    "ng_minor": "不明",
+    "ng_reason_chain": "",
+    "branch_kind": "#3-1",
+    "phone_e164": "",
+    "processed_at": "2025-08-18 19:50:17"
+  }
+}

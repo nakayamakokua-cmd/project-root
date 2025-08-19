@@ -1,0 +1,207 @@
+from __future__ import annotations
+
+import json
+import os
+import sys
+import time
+from typing import List, Dict
+
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+
+from google_auth_httplib2 import AuthorizedHttp
+import httplib2
+
+
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+
+
+def load_settings() -> dict:
+    with open("config/settings.json", "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def ensure_credentials() -> Credentials:
+    """
+    token.json があればそれを使い、無ければ credentials.json からブラウザ認可。
+    """
+    creds = None
+    token_path = "token.json"
+    if os.path.exists(token_path):
+        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+    else:
+        if not os.path.exists("credentials.json"):
+            raise FileNotFoundError(
+                "credentials.json がありません。Google Cloud でOAuthクレデンシャルを作成し、"
+                "このディレクトリに配置してください。"
+            )
+        flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+        creds = flow.run_local_server(port=0)
+        with open(token_path, "w", encoding="utf-8") as f:
+            f.write(creds.to_json())
+    return creds
+
+
+def build_sheets(creds: Credentials):
+    """
+    httplib2 の timeout を指定して Sheets クライアントを生成。
+    タイムアウト秒は環境変数 GOOGLE_API_TIMEOUT（デフォルト20）
+    """
+    timeout = float(os.getenv("GOOGLE_API_TIMEOUT", "20"))
+    http = httplib2.Http(timeout=timeout)
+    authed_http = AuthorizedHttp(creds, http=http)
+    return build("sheets", "v4", http=authed_http, cache_discovery=False)
+
+
+def read_json(path: str) -> dict:
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def union_header(existing: List[str], wanted: List[str]) -> List[str]:
+    """
+    既存ヘッダーに無い wanted の列を末尾に追記したうえで返す。
+    """
+    cols = list(existing)
+    for w in wanted:
+        if w not in cols:
+            cols.append(w)
+    return cols
+
+
+@retry(
+    retry=retry_if_exception_type((HttpError, TimeoutError, OSError)),
+    wait=wait_exponential(multiplier=1, min=1, max=8),
+    stop=stop_after_attempt(5),
+    reraise=True,
+)
+def sheets_get_values(svc, spreadsheet_id: str, rng: str) -> Dict:
+    return svc.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=rng).execute()
+
+
+@retry(
+    retry=retry_if_exception_type((HttpError, TimeoutError, OSError)),
+    wait=wait_exponential(multiplier=1, min=1, max=8),
+    stop=stop_after_attempt(5),
+    reraise=True,
+)
+def sheets_update_values(svc, spreadsheet_id: str, rng: str, values: List[List[str]]):
+    body = {"values": values}
+    return svc.spreadsheets().values().update(
+        spreadsheetId=spreadsheet_id, range=rng, valueInputOption="RAW", body=body
+    ).execute()
+
+
+@retry(
+    retry=retry_if_exception_type((HttpError, TimeoutError, OSError)),
+    wait=wait_exponential(multiplier=1, min=1, max=8),
+    stop=stop_after_attempt(5),
+    reraise=True,
+)
+def sheets_append_row(svc, spreadsheet_id: str, sheet_name: str, row: List[str]):
+    rng = f"{sheet_name}!A:ZZ"
+    body = {"values": [row]}
+    return svc.spreadsheets().values().append(
+        spreadsheetId=spreadsheet_id,
+        range=rng,
+        valueInputOption="RAW",
+        insertDataOption="INSERT_ROWS",
+        body=body,
+    ).execute()
+
+
+def ensure_header_and_get_cols(svc, spreadsheet_id: str, sheet_name: str, wanted_cols: List[str]) -> List[str]:
+    """
+    先頭行を取得→無ければヘッダーを書き込み。既存に不足列があれば追記して更新。
+    最終的な列順を返す。
+    """
+    rng = f"{sheet_name}!A1:ZZ1"
+    res = sheets_get_values(svc, spreadsheet_id, rng)
+    values = res.get("values", [])
+
+    if not values:
+        # まだ何も無い → wanted_cols をヘッダーとして書く
+        sheets_update_values(svc, spreadsheet_id, rng, [wanted_cols])
+        return wanted_cols
+
+    existing = values[0]
+    merged = union_header(existing, wanted_cols)
+
+    if merged != existing:
+        sheets_update_values(svc, spreadsheet_id, rng, [merged])
+
+    return merged
+
+
+def row_from_payload(payload: dict, col_order: List[str]) -> List[str]:
+    """
+    入力 JSON（.cache/last_row.json）から、col_order に沿った行データリストを作る。
+    既存キーが無い場合は空文字。
+    """
+    return [str(payload.get(k, "")) for k in col_order]
+
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python -m scripts.sheets_writer <row_json_path>", file=sys.stderr)
+        sys.exit(1)
+
+    # 設定読み込み
+    cfg = load_settings()
+    spreadsheet_id = cfg["google"]["spreadsheet_id"]
+    sheet_name = cfg["google"]["sheet_name"]
+
+    # 行JSON読み込み
+    row_json_path = sys.argv[1]
+    payload = read_json(row_json_path)
+
+    # この列集合は “現在のMVP出力” をベースに必要列を明示。
+    # ここに列を追加しても、既存シートに自動追記されます。
+    wanted_cols = [
+        "audio_id",
+        "date",
+        "operator",
+        "ng_major",
+        "ng_minor",
+        "ng_reason_chain",  # ← NG理由（日本語, カンマ区切り, 時系列順）
+        "processed_at",
+        # 将来拡張のプレースホルダ：不足していれば自動追記される
+        "branch_kind",
+        "customer_name",
+        "phone_e164",
+        "wpm_op_median",
+        "wpm_cus_median",
+        "phase_time_sec__p1_reception",
+        "phase_time_sec__p2_connected",
+        "phase_time_sec__p3_1_content_explain",
+        "phase_time_sec__p3_2_system_reason",
+        "phase_time_sec__p3_3_not_considering",
+        "phase_time_sec__p3_4_timing",
+        "phase_time_sec__p3_content_all",
+        "total_duration_sec",
+    ]
+
+    # 認証 & クライアント
+    creds = ensure_credentials()
+    svc = build_sheets(creds)
+
+    # ヘッダー整合
+    col_order = ensure_header_and_get_cols(svc, spreadsheet_id, sheet_name, wanted_cols)
+
+    # 行成形
+    row = row_from_payload(payload, col_order)
+
+    # 追記
+    sheets_append_row(svc, spreadsheet_id, sheet_name, row)
+
+    print("✅ appended to sheet:", sheet_name)
+    # 多少の猶予（APIの後続参照で404/500を避ける）
+    time.sleep(0.2)
+
+
+if __name__ == "__main__":
+    main()

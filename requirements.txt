@@ -1,0 +1,17 @@
+# --- Google APIs（Drive / Sheets） ---
+google-api-python-client>=2.131.0
+google-auth>=2.33.0
+google-auth-httplib2>=0.2.0
+google-auth-oauthlib>=1.2.1
+httplib2>=0.22.0
+
+# --- Gemini（音声→文字起こし/解析） ---
+google-generativeai>=0.7.2
+
+# --- ユーティリティ ---
+tenacity>=8.5.0         # リトライ制御
+tqdm>=4.66.4            # 進捗バー（任意）
+python-dateutil>=2.9.0  # 日付処理
+pytz>=2024.1            # タイムゾーン
+
+# （MVPではChromaDBや音声前処理は使わないため未追加）

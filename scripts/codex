@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ここで常時読む文脈を束ねる
+python tools/codex_cli.py \
+  --model "${CODEX_MODEL:-gpt-4o-mini}" \
+  --system codex/prompts/system_prompt.md \
+  --context codex/context/product_context.md Profiles/talk_script_v1.md config/ng_master.json config/script_master.json config/settings.json \
+  --init codex/prompts/session_kickoff.md

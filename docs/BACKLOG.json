@@ -1,0 +1,46 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2025-08-18",
+  "tasks": [
+    {
+      "id": "B-001",
+      "title": "E1〜E4/G の検出・スコアリング（ステップB）",
+      "status": "done",
+      "priority": "high",
+      "owner": "",
+      "due": "",
+      "labels": ["coaching", "scoring"],
+      "desc": "script_master.json のE/G辞書を用いて発話からスコア化し、.cache/last_analysis.json へ保存"
+    },
+    {
+      "id": "B-002",
+      "title": "Gemini文字起こしの本接続（429/5xx指数バックオフ）",
+      "status": "todo",
+      "priority": "high",
+      "owner": "",
+      "due": "",
+      "labels": ["transcribe", "gemini"],
+      "desc": "GEMINI_API_KEY がある場合にAPI呼出し、発話者/タイムスタンプ抽出"
+    },
+    {
+      "id": "B-003",
+      "title": "辞書拡充（negative/positive/date_terms）",
+      "status": "todo",
+      "priority": "mid",
+      "owner": "",
+      "due": "",
+      "labels": ["dictionary"],
+      "desc": "script_master.json の dictionaries を現場発話にあわせて増強"
+    },
+    {
+      "id": "B-004",
+      "title": "可観測性（メトリクス/失敗統計）",
+      "status": "todo",
+      "priority": "mid",
+      "owner": "",
+      "due": "",
+      "labels": ["ops", "observability"],
+      "desc": "watcherのログに統計集計用の行を追加。日次集計に備える"
+    }
+  ]
+}
