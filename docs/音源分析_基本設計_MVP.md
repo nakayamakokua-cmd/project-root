@@ -75,4 +75,5 @@
 - アナライザ評価: `python -m scripts.eval_analyzer` または `make eval-analyzer`
   - フィクスチャ: `data/fixtures/analyzer/*.json`
   - 出力: 合否サマリと `logs/eval_analyzer_report.json`
+ - 一括取り込み: テキストCSV（id,text,ng_major,ng_minor,branch_kind,reason_contains）を `make import-fixtures CSV=...` でフィクスチャ化
  - 2025-08-19: analyzer 微調整—「検討していません」などの否定表現を即NG（過去検討済み・不要結論）にもマッピング、タイミング系の同点時に「繁忙期で不可」を優先。評価用スクリプト/フィクスチャを追加。

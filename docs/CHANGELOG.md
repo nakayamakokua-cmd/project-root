@@ -5,4 +5,5 @@
 - [B-003] 辞書拡充: `config/script_master.json` の `positive`/`negative`/`date_terms`/`schedule_words` を増強。analyzer はマスタ連動で自動反映。
 - [B-004-early] 可観測性: `scripts/watcher.py` に所要時間/試行回数を `logs/metrics.ndjson` へ記録。
  - [T-ANL] アナライザ精度微調整: 即NGの否定表現（「検討していません」等）を追加、タイミング系で「繁忙期で不可」優先の同点解消ロジック。
- - [T-ANL] 評価ハーネス: `scripts/eval_analyzer.py` とフィクスチャ `data/fixtures/analyzer/*.json`、実行は `make eval-analyzer`。
+- [T-ANL] 評価ハーネス: `scripts/eval_analyzer.py` とフィクスチャ `data/fixtures/analyzer/*.json`、実行は `make eval-analyzer`。
+ - [T-ANL] データ取り込み: `scripts/import_fixtures.py` と `make import-fixtures CSV=...` でテキストCSVから評価用フィクスチャ生成。

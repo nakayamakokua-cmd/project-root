@@ -13,6 +13,11 @@ eval-analyzer:
 	@echo "== Evaluating analyzer with fixtures =="; \
 	python -m scripts.eval_analyzer
 
+import-fixtures:
+	@if [ -z "$(CSV)" ]; then echo "Usage: make import-fixtures CSV=path/to/declines.csv"; exit 1; fi; \
+	echo "== Importing fixtures from $(CSV) =="; \
+	python -m scripts.import_fixtures $(CSV)
+
 resend-fallback:
 	@set -e; \
 	[ -f Outputs/csv/append_fallback.ndjson ] || (echo "no fallback"; exit 0); \
