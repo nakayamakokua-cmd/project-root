@@ -15,3 +15,7 @@
 - 可観測性: 監視ログへ所要時間/失敗統計を出力、日次集計下準備
 - transcriber: 話者推定の精度向上（OP/CUSヒューリスティクス強化）
 - analyzer: E/G の evidence をCSVにも要約列として追加するか検討
+
+### 2025-08-19 アナライザ評価/微調整
+- 評価ハーネス: `scripts/eval_analyzer.py` と `data/fixtures/analyzer/*.json` を追加（`make eval-analyzer`）
+- 微調整: 「検討していません」等を即NG（過去検討済み・不要結論）に追加。タイミング系の同点を「繁忙期で不可」優先で解消。

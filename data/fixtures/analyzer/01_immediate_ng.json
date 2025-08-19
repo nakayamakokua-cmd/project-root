@@ -1,0 +1,16 @@
+{
+  "transcript_text": "…",
+  "segments": [
+    {"t": "00:05", "speaker": "OP",  "text": "もしもし。KOKUAの田中でございます。"},
+    {"t": "00:08", "speaker": "CUS", "text": "はい。営業はお断りしています。"}
+  ],
+  "meta": {"language": "ja"},
+  "file_meta": {"filename": "dummy.mp3"},
+  "expected": {
+    "ng_major": "即NG",
+    "ng_minor": "営業一律お断り",
+    "branch_kind": "#3-1",
+    "reason_contains": ["営業一律お断り"]
+  }
+}
+

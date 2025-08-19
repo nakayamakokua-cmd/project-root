@@ -9,6 +9,10 @@ run-all:
 	echo "== Sheets append (fallback NDJSON) =="; \
 	python -m scripts.sheets_writer .cache/last_row.json || (echo "Sheets timeout -> fallback"; cat .cache/last_row.json >> Outputs/csv/append_fallback.ndjson)
 
+eval-analyzer:
+	@echo "== Evaluating analyzer with fixtures =="; \
+	python -m scripts.eval_analyzer
+
 resend-fallback:
 	@set -e; \
 	[ -f Outputs/csv/append_fallback.ndjson ] || (echo "no fallback"; exit 0); \

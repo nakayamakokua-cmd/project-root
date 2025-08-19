@@ -1,0 +1,16 @@
+{
+  "transcript_text": "…",
+  "segments": [
+    {"t": "00:04", "speaker": "OP",  "text": "請求書の件で…"},
+    {"t": "00:06", "speaker": "CUS", "text": "TOKIUMを使ってます。"}
+  ],
+  "meta": {"language": "ja"},
+  "file_meta": {"filename": "dummy.mp3"},
+  "expected": {
+    "ng_major": "システム・ツール状況",
+    "ng_minor": "競合サービス利用中",
+    "branch_kind": "#3-2",
+    "reason_contains": ["競合サービス利用中"]
+  }
+}
+

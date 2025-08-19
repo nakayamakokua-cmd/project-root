@@ -1,0 +1,16 @@
+{
+  "transcript_text": "…",
+  "segments": [
+    {"t": "00:04", "speaker": "OP",  "text": "日程のご相談で…"},
+    {"t": "00:07", "speaker": "CUS", "text": "今は忙しくて予定がわからないです。"}
+  ],
+  "meta": {"language": "ja"},
+  "file_meta": {"filename": "dummy.mp3"},
+  "expected": {
+    "ng_major": "タイミング・時期要因",
+    "ng_minor": "繁忙期で不可",
+    "branch_kind": "#3-4",
+    "reason_contains": ["繁忙期で不可"]
+  }
+}
+

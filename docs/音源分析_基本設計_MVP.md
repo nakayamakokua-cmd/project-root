@@ -23,6 +23,7 @@
   - `date_terms`/`schedule_words`: 「日程」語の検出（MEDAPANI 判定）
   - `negative`: 「未検討/予定なし」等の検出強化（#3-3 判定）
   - 既存ヒューリスティクス（忙しい/予定不明 等）と併用
+  - タイブレーク: 同一時刻・同一カテゴリで複数の中分類が該当する場合、スコア同点時は「タイミング・時期要因」で「繁忙期で不可」を優先（軽微なヒューリスティクス）
 
 ## ステップB（コーチング: E1〜E4 + G）
 - 目的: スクリプト適合度の簡易スコアを算出し、改善の糸口を提示
@@ -68,5 +69,10 @@
 - 2025-08-18: ステップB（E1〜E4/G）のスコアリングを追加。`script_master.json` に `coaching.patterns` を新設し、`compute_coaching()` を実装。
 - 2025-08-18: watcher にリトライ/ログ/退避メモを追加、transcriber を Gemini 対応スケルトン化、Makefile に `watch` を追加。
 - 2025-08-19: transcriber を Gemini 本接続。`google-generativeai` 経由でAPI呼出し、`response_mime_type=application/json` を指定。429/5xxは指数バックオフ（1/2/4/… 最大5回）で再試行し、最終失敗時はダミーにフォールバック。出力スキーマ（transcript_text/segments/meta）は維持。
-- 2025-08-19: `config/script_master.json` の dictionaries を増補（positive/negative/date_terms/schedule_words）。analyzer の辞書連動は既存仕様のまま（DATE_TERMS結合→日程ヒント、negative→未検討/不要の判定補強）。
+ - 2025-08-19: `config/script_master.json` の dictionaries を増補（positive/negative/date_terms/schedule_words）。analyzer の辞書連動は既存仕様のまま（DATE_TERMS結合→日程ヒント、negative→未検討/不要の判定補強）。
  - 2025-08-19: watcher に観測メトリクスを追加（所要時間/試行回数）。`logs/metrics.ndjson` にNDJSON形式で出力。
+## 評価（ローカル）
+- アナライザ評価: `python -m scripts.eval_analyzer` または `make eval-analyzer`
+  - フィクスチャ: `data/fixtures/analyzer/*.json`
+  - 出力: 合否サマリと `logs/eval_analyzer_report.json`
+ - 2025-08-19: analyzer 微調整—「検討していません」などの否定表現を即NG（過去検討済み・不要結論）にもマッピング、タイミング系の同点時に「繁忙期で不可」を優先。評価用スクリプト/フィクスチャを追加。

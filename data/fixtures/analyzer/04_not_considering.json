@@ -1,0 +1,16 @@
+{
+  "transcript_text": "…",
+  "segments": [
+    {"t": "00:03", "speaker": "OP",  "text": "受領の自動化について…"},
+    {"t": "00:08", "speaker": "CUS", "text": "今は検討していません。"}
+  ],
+  "meta": {"language": "ja"},
+  "file_meta": {"filename": "dummy.mp3"},
+  "expected": {
+    "ng_major": "即NG",
+    "ng_minor": "過去検討済み・不要結論",
+    "branch_kind": "#3-3",
+    "reason_contains": ["過去検討済み・不要結論"]
+  }
+}
+

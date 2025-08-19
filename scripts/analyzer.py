@@ -44,7 +44,7 @@ PHRASES = {
     "即NG": {
         "営業一律お断り": [r"営業.*お断り", r"結構です", r"不要です", r"興味(ない|ありません)"],
         "即時拒否・低関心": [r"いいです", r"間に合って(る|ます)"],
-        "過去検討済み・不要結論": [r"以前.*検討.*不要", r"検討しません"],
+        "過去検討済み・不要結論": [r"以前.*検討.*不要", r"検討しません", r"検討していません", r"検討していない"],
     },
     "権限・担当範囲": {
         "判断権限なし": [r"決裁権.*ない", r"権限.*ない"],
@@ -260,7 +260,12 @@ def finalize_ng(cands: List[Dict[str, Any]], last_tsec: int) -> Dict[str, Any]:
         else:
             def prio_idx(c):
                 return PRIORITY.index(c["major"]) if c["major"] in PRIORITY else len(PRIORITY)
-            final = sorted(same_t, key=lambda c: (prio_idx(c), c["score_hint"]))[-1]
+            # minorタイブレーク（同一major）の簡易優先度: タイミング系は「繁忙期で不可」を優先
+            def minor_bonus(c):
+                if c["major"] == "タイミング・時期要因" and c.get("minor") == "繁忙期で不可":
+                    return 0.5
+                return 0.0
+            final = sorted(same_t, key=lambda c: (prio_idx(c), c["score_hint"], minor_bonus(c)))[-1]
     else:
         tail = cands[-5:]
         def prio_idx(c):

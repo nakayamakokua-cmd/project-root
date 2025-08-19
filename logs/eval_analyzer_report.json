@@ -1,0 +1,98 @@
+[
+  {
+    "file": "01_immediate_ng.json",
+    "expected": {
+      "ng_major": "即NG",
+      "ng_minor": "営業一律お断り",
+      "branch_kind": "#3-1",
+      "reason_contains": [
+        "営業一律お断り"
+      ]
+    },
+    "actual": {
+      "ng_major": "即NG",
+      "ng_minor": "営業一律お断り",
+      "ng_reason_chain": "営業一律お断り",
+      "branch_kind": "#3-1"
+    },
+    "pass": true,
+    "checks": {
+      "ng_major": true,
+      "ng_minor": true,
+      "branch_kind": true,
+      "reason_contains": true
+    }
+  },
+  {
+    "file": "02_competitor_system.json",
+    "expected": {
+      "ng_major": "システム・ツール状況",
+      "ng_minor": "競合サービス利用中",
+      "branch_kind": "#3-2",
+      "reason_contains": [
+        "競合サービス利用中"
+      ]
+    },
+    "actual": {
+      "ng_major": "システム・ツール状況",
+      "ng_minor": "競合サービス利用中",
+      "ng_reason_chain": "既存システム導入済み,競合サービス利用中",
+      "branch_kind": "#3-2"
+    },
+    "pass": true,
+    "checks": {
+      "ng_major": true,
+      "ng_minor": true,
+      "branch_kind": true,
+      "reason_contains": true
+    }
+  },
+  {
+    "file": "03_timing_busy.json",
+    "expected": {
+      "ng_major": "タイミング・時期要因",
+      "ng_minor": "繁忙期で不可",
+      "branch_kind": "#3-4",
+      "reason_contains": [
+        "繁忙期で不可"
+      ]
+    },
+    "actual": {
+      "ng_major": "タイミング・時期要因",
+      "ng_minor": "繁忙期で不可",
+      "ng_reason_chain": "繁忙期で不可,先の予定不透明",
+      "branch_kind": "#3-4"
+    },
+    "pass": true,
+    "checks": {
+      "ng_major": true,
+      "ng_minor": true,
+      "branch_kind": true,
+      "reason_contains": true
+    }
+  },
+  {
+    "file": "04_not_considering.json",
+    "expected": {
+      "ng_major": "即NG",
+      "ng_minor": "過去検討済み・不要結論",
+      "branch_kind": "#3-3",
+      "reason_contains": [
+        "過去検討済み・不要結論"
+      ]
+    },
+    "actual": {
+      "ng_major": "即NG",
+      "ng_minor": "過去検討済み・不要結論",
+      "ng_reason_chain": "過去検討済み・不要結論",
+      "branch_kind": "#3-3"
+    },
+    "pass": true,
+    "checks": {
+      "ng_major": true,
+      "ng_minor": true,
+      "branch_kind": true,
+      "reason_contains": true
+    }
+  }
+]
