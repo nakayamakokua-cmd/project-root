@@ -1,8 +1,17 @@
-# Recent Changes (Context)
+# 最近の変更履歴
 
-- 2025-08-18: コミュニケーション方針を強化。日本語回答と非エンジニア向けの簡潔な説明を必須化。
-  - 追加: `codex/prompts/system_prompt.md` に方針追記
-  - 追加: `codex/context/product_context.md` に利用者プロファイル（日本語/非エンジニア）を追記
-  - 追加: `docs/クイックガイド_非エンジニア向け.md` を新設
-  - 参照: `AGENTS.md` に入口リンク、`docs/ROADMAP.md`/`docs/BACKLOG.json` を整備
+### 2025-08-19 初期設定
+- Git運用ルールを整備
+- workflow_rules.md を作成
 
+---
+
+### 2025-08-19 B-002/B-003 対応
+- transcriber: Gemini API 本接続（指数バックオフ、JSON整形、キー未設定/失敗時のダミー）
+- 辞書拡充: script_master.dictionaries（positive/negative/date_terms/schedule_words）を増補
+- ROADMAP/BACKLOG/設計ドキュ/CHANGELOG を同期更新
+
+次回TODO（提案）
+- 可観測性: 監視ログへ所要時間/失敗統計を出力、日次集計下準備
+- transcriber: 話者推定の精度向上（OP/CUSヒューリスティクス強化）
+- analyzer: E/G の evidence をCSVにも要約列として追加するか検討

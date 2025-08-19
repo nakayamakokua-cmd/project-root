@@ -12,10 +12,10 @@
       "labels": ["coaching", "scoring"],
       "desc": "script_master.json のE/G辞書を用いて発話からスコア化し、.cache/last_analysis.json へ保存"
     },
-    {
+  {
       "id": "B-002",
       "title": "Gemini文字起こしの本接続（429/5xx指数バックオフ）",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "owner": "",
       "due": "",
@@ -25,7 +25,7 @@
     {
       "id": "B-003",
       "title": "辞書拡充（negative/positive/date_terms）",
-      "status": "todo",
+      "status": "done",
       "priority": "mid",
       "owner": "",
       "due": "",

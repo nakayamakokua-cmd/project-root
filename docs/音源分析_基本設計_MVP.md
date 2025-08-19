@@ -66,3 +66,5 @@
 - 2025-08-18: analyzer をマスタ連動化（ng_master の競合語/優先順、script_master の日程語/未検討語を取り込み）。分岐判定とNG候補抽出の精度向上。
 - 2025-08-18: ステップB（E1〜E4/G）のスコアリングを追加。`script_master.json` に `coaching.patterns` を新設し、`compute_coaching()` を実装。
 - 2025-08-18: watcher にリトライ/ログ/退避メモを追加、transcriber を Gemini 対応スケルトン化、Makefile に `watch` を追加。
+- 2025-08-19: transcriber を Gemini 本接続。`google-generativeai` 経由でAPI呼出し、`response_mime_type=application/json` を指定。429/5xxは指数バックオフ（1/2/4/… 最大5回）で再試行し、最終失敗時はダミーにフォールバック。出力スキーマ（transcript_text/segments/meta）は維持。
+- 2025-08-19: `config/script_master.json` の dictionaries を増補（positive/negative/date_terms/schedule_words）。analyzer の辞書連動は既存仕様のまま（DATE_TERMS結合→日程ヒント、negative→未検討/不要の判定補強）。
