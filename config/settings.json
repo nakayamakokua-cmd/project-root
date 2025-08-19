@@ -8,6 +8,7 @@
   "gemini": {
     "model_transcribe": "gemini-2.5-pro",
     "model_analyze": "gemini-2.5-pro",
+    "model_classify": "gemini-2.5-pro",
     "api_key_env": "GEMINI_API_KEY"
   },
   "masters": {
@@ -17,6 +18,9 @@
   "io": {
     "temp_dir": ".cache",
     "log_dir": "logs"
+  },
+  "features": {
+    "llm_classify": false
   },
   "sheets": {
     "spreadsheet_id": "1AkkDITbtPXPmE9cvHJ5NxOLlMfKwrZamptfC_Wmii0I",

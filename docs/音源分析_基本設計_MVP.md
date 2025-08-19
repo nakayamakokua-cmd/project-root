@@ -25,6 +25,13 @@
   - 既存ヒューリスティクス（忙しい/予定不明 等）と併用
   - タイブレーク: 同一時刻・同一カテゴリで複数の中分類が該当する場合、スコア同点時は「タイミング・時期要因」で「繁忙期で不可」を優先（軽微なヒューリスティクス）
 
+### LLM併用（オプション）
+- 目的: ルールベースの限界を補完し、多様な言い回しに対応するための分類補助。
+- 有効化: `config/settings.json` の `features.llm_classify` を `true` にし、Gemini APIキーを設定（`gemini.api_key_env`）。
+- 実装: `scripts/llm_classifier.py`（Geminiへ会話を渡し、JSONで `ng_major/ng_minor/ng_reason_chain/branch_kind` を返す）。
+- 統合: `scripts/analyzer.py` がルール結果を生成後、LLM結果が有効なら上書き採用（Sheetsの列仕様は不変）。
+- フォールバック: キー無し/失敗時はルールベースのみで動作。
+
 ## ステップB（コーチング: E1〜E4 + G）
 - 目的: スクリプト適合度の簡易スコアを算出し、改善の糸口を提示
 - 参照: `config/script_master.json`
@@ -75,5 +82,6 @@
 - アナライザ評価: `python -m scripts.eval_analyzer` または `make eval-analyzer`
   - フィクスチャ: `data/fixtures/analyzer/*.json`
   - 出力: 合否サマリと `logs/eval_analyzer_report.json`
- - 一括取り込み: テキストCSV（id,text,ng_major,ng_minor,branch_kind,reason_contains）を `make import-fixtures CSV=...` でフィクスチャ化
+- 一括取り込み: テキストCSV（id,text,ng_major,ng_minor,branch_kind,reason_contains）を `make import-fixtures CSV=...` でフィクスチャ化
+ - LLM評価（任意・ネット必要）: `features.llm_classify=true` で `make eval-analyzer` を実行し、ルール/LLMの合否差分を `.cache/last_analysis.json` で確認（将来、専用比較ツール追加予定）
  - 2025-08-19: analyzer 微調整—「検討していません」などの否定表現を即NG（過去検討済み・不要結論）にもマッピング、タイミング系の同点時に「繁忙期で不可」を優先。評価用スクリプト/フィクスチャを追加。

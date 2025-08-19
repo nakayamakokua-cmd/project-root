@@ -3,6 +3,7 @@ import sys, json, re
 from pathlib import Path
 from typing import List, Dict, Any
 from scripts.utils import load_settings, read_json, write_json, parse_filename_meta, now_str
+import subprocess, os
 
 """
 入力: transcript_json（scripts/transcriber.py の出力）
@@ -386,12 +387,35 @@ def main():
         "processed_at": now_str(),
     }
 
+    # オプション: LLM分類（Gemini）で上書き（設定 + APIキーがある場合）
+    used_llm = False
+    settings = load_settings()
+    if settings.get("features", {}).get("llm_classify"):
+        api_env = settings.get("gemini", {}).get("api_key_env", "GEMINI_API_KEY")
+        if os.environ.get(api_env):
+            try:
+                proc = subprocess.run([sys.executable, "-m", "scripts.llm_classifier", sys.argv[1]], check=True, capture_output=True, text=True)
+                llm_res = json.loads(proc.stdout or "{}")
+                # 最低限フィールドがある場合に採用
+                if llm_res.get("ng_major") and llm_res.get("ng_minor"):
+                    out.update({
+                        "ng_major": llm_res.get("ng_major"),
+                        "ng_minor": llm_res.get("ng_minor"),
+                        "ng_reason_chain": llm_res.get("ng_reason_chain", out["ng_reason_chain"]) or out["ng_reason_chain"],
+                        "branch_kind": llm_res.get("branch_kind", branch_kind) or branch_kind,
+                    })
+                    used_llm = True
+            except Exception as e:
+                # 無視してルールベース結果を採用
+                pass
+
     # 監査用に .cache/last_analysis.json に保存
     write_json(".cache/last_analysis.json", {
         "candidates": cands,
         "final": ng.get("final"),
         "out_row": out,
         "coaching": coaching,
+        "source": ("llm" if used_llm else "rule"),
     })
 
     # 標準出力はシート追記用の行 JSON
